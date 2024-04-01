@@ -1,0 +1,59 @@
+# Excluir todos los archivos ejecutables
+*.exe
+*.dll
+*.so
+*.o
+*.a
+*.obj
+*.ko
+*.out
+# Específicos de sistemas operativos
+.DS_Store
+Thumbs.db
+
+# Carpetas de configuración de IDEs/editores
+/.idea/
+/.vscode/
+*.sublime-workspace
+
+# Directorios de compilación
+/build/
+/debug/
+/release/
+
+# Archivos de paquetes
+*.jar
+*.war
+*.ear
+
+# Dependencias
+/node_modules/
+/jspm_packages/
+/bower_components/
+
+# Archivos de log
+*.log
+*.log.*
+
+# Archivos temporales
+*.tmp
+*.swp
+*.swo
+*~
+
+# Archivos de entornos virtuales
+venv/
+env/
+ENV/
+
+# Carpetas de distribución
+/dist/
+/out/
+
+# Otros archivos y carpetas que puedan contener información sensible o ser innecesarios
+/.env
+/.env.local
+/.env.development.local
+/.env.test.local
+/.env.production.local
+/config.json
