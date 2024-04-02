@@ -11,15 +11,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../analizadorLexico/analizadorLexico.h"
 #include "analizadorSintactico.h"
-#include "../sistemaEntrada/sistemaEntrada.h"
+#include "../tablasHash/tablaHash.h"
+#include "../lex.yy.h"
 
 /**
  * Función que inicia el análisis léxico, pidiendo componentes léxicos al analizador
  * @param tabla: tabla de símbolos en la que se buscará el siguiente componente léxico
- * @param ficheroEntrada: fichero de entrada
  */
-void iniciarAnalisis(hashTable *tabla, FILE *ficheroEntrada);
+void iniciarAnalisis(hashTable *tabla);
 
 #endif // ANALIZADORSINTACTICO_H

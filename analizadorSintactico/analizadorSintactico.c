@@ -9,9 +9,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../analizadorLexico/analizadorLexico.h"
 #include "analizadorSintactico.h"
-#include "../sistemaEntrada/sistemaEntrada.h"
+#include "../tablasHash/tablaHash.h"
+#include "../lex.yy.h"
 
 
 void imprimirComponenteLexico(token c);
@@ -21,18 +21,18 @@ void imprimirComponenteLexico(token c);
  * @param tabla: tabla de símbolos en la que se buscará el siguiente componente léxico
  * @param ficheroEntrada: fichero de entrada
  */
-void iniciarAnalisis(hashTable *tabla, FILE *ficheroEntrada) {
+void iniciarAnalisis(hashTable *tabla) {
     token t;
 
     printf("%-33s %-10s\n", "Lexema", "ID");
     printf("--------------------------------- ----------\n");
 
-    do { //Pedimos componentes lexicos al analizadorLexico hasta que reciba EOF.
+    do {
         printf("--------------------------------- ----------\n");
 
-        int liberarMemoria = seguinte_comp_lexico(&t, tabla, ficheroEntrada);
-        //Si ha habido algún error, o es el fin de fichero no se imprime el componente.
-        if (t.componente != EOF) {
+        int liberarMemoria = seguinte_comp_lexico(&t, *tabla);
+        // Si ha habido algún error, o es el fin de fichero no se imprime el componente.
+        if (t.componente != EOF && t.componente != 0) {
             imprimirComponenteLexico(t);
         }
 
@@ -40,6 +40,7 @@ void iniciarAnalisis(hashTable *tabla, FILE *ficheroEntrada) {
 
     } while (t.componente != EOF);
 }
+
 
 // Imprime el componente léxico en la consola
 void imprimirComponenteLexico(token t) {
