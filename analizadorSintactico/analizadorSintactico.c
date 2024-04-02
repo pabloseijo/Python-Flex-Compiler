@@ -30,7 +30,7 @@ void iniciarAnalisis(hashTable *tabla) {
     do {
         printf("--------------------------------- ----------\n");
 
-        int liberarMemoria = seguinte_comp_lexico(&t, *tabla);
+        int liberarMemoria = seguinte_comp_lexico(&t, tabla);
         // Si ha habido algún error, o es el fin de fichero no se imprime el componente.
         if (t.componente != EOF && t.componente != 0) {
             imprimirComponenteLexico(t);

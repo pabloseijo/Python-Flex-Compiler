@@ -10,9 +10,9 @@ wilcoxon_table = {5e-2: {6: 0, 7: 2, 8: 4, 9: 6, 10: 8, 11: 11, 12: 14},
                   1e-2: {7: 0, 8: 2, 9: 3}}
 
 def wilcoxon_test(a, b, alpha = .05):
-    """
+    '''
     Performs the Wilcoxon Rank non-parametric test for two algorithms.
-    """
+    '''
     N = len(a) # Number of datasets
     # Compute the differences and keep the signs
     differences, signs = ([abs(a[i] - b[i]) for i in xrange(N)],

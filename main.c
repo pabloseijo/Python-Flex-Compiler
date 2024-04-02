@@ -23,11 +23,11 @@ int main(int argc,char *argv[]){
 
     inicializarTabla(&tabla);
 
-    //imprimirTabla(tabla);
+    imprimirTabla(tabla);
     
     iniciarAnalisis(&tabla);
 
-    //imprimirTabla(tabla);
+    imprimirTabla(tabla);
 
     destruirTabla(tabla);
     cerrarArchivo();

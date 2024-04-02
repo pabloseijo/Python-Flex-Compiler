@@ -13,13 +13,13 @@ import ply.lex as lex
 /* ---------------- DEFINICIONES ----------------  */
 
 /* Ponemos las definiciones básicas que nos proporciona python.org */
-letra            [A-Za-z]
+letra            [A-Za-z_]
 digit            [0-9]
 nonzerodigit     [1-9]
 binario          [01]
 octal            [0-7]
 hexadecimal      [0-9A-Fa-f]
-espacio          [ \t]
+espacio          [ \t\n]
 
 /* ID */
 
@@ -27,23 +27,35 @@ ID               {letra}({letra}|{digit}|_)*
 
 /* STRINGS */
 
-stringescapeseq  "\\."
+/* Secuencias de Escape en Cadenas */
+stringescapeseq  \\\\.
+
+/* Caracteres de Cadena */
 shortstringchar  [^\\]
 longstringchar   [^\\\n]
-longstringitem   [{longstringchar} | {stringescapeseq}]
-shortstringitem  [shortstringchar | stringescapeseq]
-shortstring      [\'{shortstringitem}*\' | \"{shortstringitem}*\"]
-longstring       [\'\'\'{longstringitem}*\'\'\' | \"\"\"{longstringitem}*\"\"\"]
-stringprefix      ("r"|"u"|"R"|"U"|"f"|"F"|"fr"|"Fr"|"fR"|"FR"|"rf"|"rF"|"Rf"|"RF")?
-stringliteral    [{stringprefix}][{shortstring}|{longstring}]
+
+/* Elementos de Cadena */
+shortstringitem  ({shortstringchar}|{stringescapeseq})
+longstringitem   ({longstringchar}|{stringescapeseq})
+
+/* Cadenas Cortas y Largas */
+shortstring      (\"([^\\\"]|{stringescapeseq})*\"|\'([^\\\']|{stringescapeseq})*\')
+longstring       \"\"\"((\\.|\"?|\"\"?|[^\"\\])*)\"\"\"|\'\'\'((\\.|\'?|\'\'?|[^\'\\])*)\'\'\'
+
+
+/* Prefijo de Cadena y Literal de Cadena Completo */
+stringprefix      (r|u|R|U|f|F|fr|Fr|fR|FR|RF|rF|Rf|RF)?
+stringliteral    {stringprefix}({shortstring})
+
 
 /* INTEGERS */
 
-decinteger       {nonzerodigit}([_]?{digit})* | "0"+([_]"0")*
-bininteger       "0"[bB]([_]?{binario})+
-octinteger       "0"[oO]([_]?{octal})+
-hexinteger       "0"[xX]([_]?{hexadecimal})+
-integer          ({decinteger} | {bininteger} | {octinteger} | {hexinteger})
+decinteger       {nonzerodigit}(_?{digit})*
+bininteger       "0"[bB](\_?{binario})+
+octinteger       "0"[oO](\_?{octal})+
+hexinteger       "0"[xX](\_?{hexadecimal})+
+cero             "0"+
+integernumber    {decinteger}|{bininteger}|{octinteger}|{hexinteger}|{cero}
 
 /* FLOATS */
 
@@ -60,26 +72,25 @@ imagnumber       ({floatnumber}|{digitpart})[jJ]
 
 /* OPERADORES */
 
-operadores        (\+\+|\-\-|\+|\-|\*{1,2}|\/{1,2}|\%|\@|\<\<|\>\>|\&|\||\^|\~|\:\=|\<|\>\=\<|\>\=|\=\=|\!\=)
+operadores       (\+\+|\-\-|\+|\-|\*{1,2}|\/{1,2}|\%|\@|\<\<|\>\>|\&|\||\^|\~|\:\=|\<|\>|\=\<|\>\=|\=\=|\!\=)
 
 /* DELIMITADORES */ 
 
-delimitadores     (\(\)|\[\]|\{\}|,|:|\.|;|\@|\=|\->|\+=|\-=|\*=|\/=|\/\/=|\%=|\@=|\&=|\|=|\^=|>>=|<<=|\*\*=)
+delimitadores     (\(|\)|\[|\]|\{|\}|,|:|\.|;|\@|\=|\->|\+=|\-=|\*=|\/=|\%=|\@=|\&=|\|=|\^=|>>=|<<=|\*\*=|\/\/=)
+
 
 /* COMENTARIOS */
-comentario        "#"[^\n]*
+
+comentario        ("#"[^\n]*)|{longstring}
 
 %%
 
 {espacio}       ;    /* NO SE HACE NADA */
 {comentario}    ;   /* NO SE HACE NADA */
 
+{integernumber} { return NUM_INT; }
 {ID}            { return ID; }
 {stringliteral} { return STRING; }
-{nonzerodigit}([_]?{digit})* | "0"+([_]"0")*  { return NUM_INT; } /* Para decinteger */
-"0"[bB]([_]?{binario})+                      { return NUM_INT; } /* Para bininteger */
-"0"[oO]([_]?{octal})+                        { return NUM_INT; } /* Para octinteger */
-"0"[xX]([_]?{hexadecimal})+                  { return NUM_INT; } /* Para hexinteger */
 {floatnumber}    { return NUM_FLOAT; }
 {imagnumber}    { return NUM_FLOAT; }
 {operadores}    { return OP; }
@@ -105,15 +116,18 @@ void abrirArchivo(char *nombreArchivo) {
 int seguinte_comp_lexico(token *actual, hashTable *tabla) {
     actual->componente = yylex();
 
+    int aux = 0;
+
     if (actual->componente != 0) {
         actual->lexema = strdup(yytext);
-        if (actual->componente == ID) {
-            insertarElemento(*actual, tabla);
-            return 1; 
+        if(actual->componente == ID && ( aux = buscarElemento(actual->lexema, *tabla)) != 0){
+            actual->componente = aux;
         }
+        else if (actual->componente == ID) {
+            insertarElemento(*actual, tabla);
+        }
+        return 1; 
     }
-
-    if (actual->componente != 0) return 1;
 
     return 0; 
 }
